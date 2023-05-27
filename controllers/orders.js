@@ -14,7 +14,6 @@ function getOrder(req, res) {
       if (!order) {
         return res.status(404).send({ message: 'La orden no existe' });
       }
-
       res.status(200).send({ order });
     })
     .catch((error) => {
@@ -84,12 +83,12 @@ function saveOrder(req, res) {
                   res.status(400).send({ message: `Error al guardar en la base de datos: ${err}` });
                 });
             })
-            .catch((error) => {
-              return res.status(400).send({ message: 'Error al realizar la verificación de productos' });
+            .catch((err) => {
+              return res.status(400).send({ message: `Error al realizar la verificación de productos:  ${err}` });
             });
         })
-        .catch((error) => {
-          return res.status(400).send({ message: 'Error al realizar la verificación de usuario' });
+        .catch((err) => {
+          return res.status(400).send({ message: `Error al realizar la verificación de usuario:  ${err}` });
         });
     })
     .catch((response) => {
@@ -128,6 +127,8 @@ function deleteOrder (req, res){
       return res.status(500).send({ message: `Error al eliminar la orden: ${err}` });
     });
 }
+
+
 
 module.exports = {
     getOrder,

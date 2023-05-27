@@ -174,7 +174,5 @@ describe('signIn', () => {
         });
       
         expect(User.findOne).toHaveBeenCalledWith({ email: req.body.email });
-      });
-      
-  
+      });   
 });

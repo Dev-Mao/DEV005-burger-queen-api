@@ -57,7 +57,7 @@ function updateUser (req, res){
     let userId = req.params.userIdId
     let update = req.body
 
-    userId.findByIdAndUpdate(userId, update)
+    User.findByIdAndUpdate(userId, update)
     .then((userUpdate) => {
         res.status(200).send({ user: userUpdate });
       })
