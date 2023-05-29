@@ -31,13 +31,14 @@ api.delete('/users/:userId', auth.isAuth, auth.isAdmin, userCtrl.deleteUser)
 
 // Autenticación
 api.post('/login', (req, res) => {
-    authCtrl.signIn(req, res)
-      .then((result) => {
-        res.status(result.status).send(result);
-      })
-      .catch((err) => {
-        res.status(err.status).send(err);
-      });
-  });
+  authCtrl.signIn(req, res)
+    .then((result) => {
+      res.status(result.status).send(result);
+    })
+    .catch((err) => {
+      res.status(err.status).send(err);
+    });
+});
 
 module.exports = api
+
