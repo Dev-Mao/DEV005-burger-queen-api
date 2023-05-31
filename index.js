@@ -5,6 +5,10 @@ const config = require('./config')
 
 const port = process.argv[2] || config.port || 8080;
 
+const pkg = require('./package.json');
+
+app.set('pkg', pkg);
+
 async function connectToDatabase() {
   try {
     await mongoose.connect(config.db, {

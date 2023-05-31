@@ -19,7 +19,7 @@ describe('isAuth', () => {
     
         await isAuth(req, res, next);
     
-        expect(res.status).toHaveBeenCalledWith(403);
+        expect(res.status).toHaveBeenCalledWith(401);
         expect(res.send).toHaveBeenCalledWith({ message: 'No tienes autorización' });
         expect(next).not.toHaveBeenCalled();
     });
@@ -86,7 +86,7 @@ describe('isAdmin', () => {
 
         await isAdmin(req, res, next)
 
-        expect(res.status).toHaveBeenCalledWith(403);
+        expect(res.status).toHaveBeenCalledWith(401);
         expect(next).not.toHaveBeenCalled();
     })
 

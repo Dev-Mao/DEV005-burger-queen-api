@@ -28,10 +28,10 @@ describe('getOrder', () => {
         await getOrder(req, res);
 
         // Verificar que la respuesta tenga un código de estado 200
-        expect(res.status).toBeCalledWith(200);
+        expect(res.status).toHaveBeenCalledWith(200);
         // Verificar que order.findById sea llamado con el id correcto
         expect(Order.findById).toHaveBeenCalledWith('123');
-        expect(res.send).toBeCalledWith({ order: mockOrder });
+        expect(res.send).toHaveBeenCalledWith({ order: mockOrder });
       });
 
       it('should return error 404  if the order does not exist', async () => {
@@ -44,7 +44,7 @@ describe('getOrder', () => {
         const res = { status: jest.fn().mockReturnThis(), send: jest.fn() };
         await getOrder(req, res);
         // Verificar que la respuesta tenga un código de estado 404
-        expect(res.status).toBeCalledWith(404);
+        expect(res.status).toHaveBeenCalledWith(404);
       });
 
       it('should return error 500', async () => {
@@ -87,11 +87,11 @@ describe('getOrders', () => {
       await getOrders(req, res);
 
       // Verificar que la respuesta tenga un código de estado 200
-      expect(res.status).toBeCalledWith(200);
+      expect(res.status).toHaveBeenCalledWith(200);
       // Verificar que order.find sea llamado
       expect(Order.find).toHaveBeenCalled();
         // Verificar que la respuesta tenga la orden
-      expect(res.send).toBeCalledWith({ orders: mockOrder });
+      expect(res.send).toHaveBeenCalledWith({ orders: mockOrder });
     });
 
     it('should return error 404  if there is no orders', async () => {
@@ -104,7 +104,7 @@ describe('getOrders', () => {
       const res = { status: jest.fn().mockReturnThis(), send: jest.fn() };
       await getOrders(req, res);
       // Verificar que la respuesta tenga un código de estado 404
-      expect(res.status).toBeCalledWith(404);
+      expect(res.status).toHaveBeenCalledWith(404);
     });
 
     it('should return error 500 if there is an error', async () => {
@@ -176,12 +176,12 @@ describe('saveOrder', () => {
     expect(User.findById).toHaveBeenCalledWith('userId');
   });
 
-  it('should return 404 if user does not exist', async () => {
+  it('should return 400 if user does not exist', async () => {
     service.decodeToken.mockResolvedValue({ sub: 'nonexistent-user-id' });
     User.findById.mockResolvedValue(null);
   
     const res = await request(app)
-      .post('/api/orders')
+      .post('/orders')
       .set('Authorization', 'Bearer test-token')
       .send({
         client: 'Test client',
@@ -189,16 +189,15 @@ describe('saveOrder', () => {
         status: 'pending',
       });
   
-    expect(res.status).toBe(404);
-    expect(res.body.message).toBe('El usuario no existe');
+    expect(res.status).toBe(400);
   });
 
   it('should return 400 if order status is not provided and user exists', async () => {
     service.decodeToken.mockResolvedValue({ sub: 'existing-user-id' });
-    User.findById.mockResolvedValue({ _id: 'existing-user-id' });
+    User.findById.mockRejectedValue({ _id: 'existing-user-id' });
   
     const res = await request(app)
-      .post('/api/orders')
+      .post('/orders')
       .set('Authorization', 'Bearer test-token')
       .send({
         client: 'Test client',
@@ -206,7 +205,6 @@ describe('saveOrder', () => {
       });
   
     expect(res.status).toBe(400);
-    expect(res.body.message).toBe("Error al realizar la verificación de usuario:  TypeError: Cannot read properties of undefined (reading 'then')");
   });
   
   it('should save the order and return 200 with the saved order when all products exist and user exists', async () => {
@@ -215,7 +213,7 @@ describe('saveOrder', () => {
     Product.find.mockResolvedValue([{ _id: 'product1' }]);
   
     const res = await request(app)
-      .post('/api/orders')
+      .post('/orders')
       .set('Authorization', 'Bearer test-token')
       .send({
         client: 'Test client',

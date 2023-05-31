@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.59% </span>
+                <span class="strong">91.07% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>50/54</span>
+                <span class='fraction'>51/56</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">75% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>9/12</span>
+                <span class='fraction'>12/16</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.45% </span>
+                <span class="strong">90.9% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>49/53</span>
+                <span class='fraction'>50/55</span>
             </div>
         
             
@@ -201,7 +201,10 @@
 <a name='L136'></a><a href='#L136'>136</a>
 <a name='L137'></a><a href='#L137'>137</a>
 <a name='L138'></a><a href='#L138'>138</a>
-<a name='L139'></a><a href='#L139'>139</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -254,13 +257,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -309,6 +312,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -350,7 +356,7 @@ function getOrder(req, res) {
   let orderId = req.params.orderId;
 &nbsp;
   Order.findById(orderId)
-    .populate('products.product') // Utilizar "populate" para obtener los detalles del producto
+    .populate('products.product')
     .then((order) =&gt; {
       if (!order) {
         return res.status(404).send({ message: 'La orden no existe' });
@@ -393,14 +399,14 @@ function saveOrder(req, res) {
       User.findById(userId)
         .then((user) =&gt; {
           if (!user) {
-            return res.status(404).send({ message: 'El usuario no existe' });
+            return res.status(400).send({ message: 'El usuario no existe' });
           }
 &nbsp;
           // Verificar que los IDs de los productos existen
           const productIds = products.map((product) =&gt; product.productId);
           Product.find({ _id: { $in: productIds } })
             .then((foundProducts) =&gt; {
-              <span class="missing-if-branch" title="if path not taken" >I</span>if (foundProducts.length !== productIds.length) {
+              <span class="missing-if-branch" title="if path not taken" >I</span>if (foundProducts.length !== productIds.length || productIds.length === 0) {
 <span class="cstat-no" title="statement not covered" >                return res.status(400).send({ message: 'Algunos productos no existen' });</span>
               }
 &nbsp;
@@ -448,6 +454,9 @@ function updateOrder(req, res) {
 &nbsp;
   Order.findByIdAndUpdate(orderId, update)
     .then((orderUpdate) =&gt; {
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(!orderUpdate){
+<span class="cstat-no" title="statement not covered" >        res.status(404).send({  message: 'La orden no existe' });</span>
+      }
       <span class="missing-if-branch" title="else path not taken" >E</span>if (update.status === 'delivered') {
         orderUpdate.deliveryDate = update.deliveryDate; // Actualizar la fecha de entrega en la respuesta
       }
@@ -484,7 +493,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-05-30T13:05:35.428Z
+                at 2023-05-31T00:49:12.108Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

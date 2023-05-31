@@ -1,11 +1,14 @@
 const path = require('path');
 const { spawn } = require('child_process');
 const kill = require('tree-kill');
+const { MongoClient } = require('mongodb');
+
+const mongoGlobalSetup = require("@shelf/jest-mongodb/lib/setup");
 
 const config = require('../config');
 
-const port = process.env.PORT || 8080;
-const baseUrl = process.env.REMOTE_URL || `http://localhost:${port}`;
+const port = process.env.PORT || 8888;
+const baseUrl = process.env.REMOTE_URL || `http:localhost:${port}`;
 
 const __e2e = {
   port,
@@ -16,7 +19,7 @@ const __e2e = {
   },
   adminToken: null,
   testUserCredentials: {
-    email: 'test@test.test',
+    email: 'test@t4ss44s55ss.com',
     password: '123456',
   },
   testUserToken: null,
@@ -26,7 +29,6 @@ const __e2e = {
   // For example: ['users/foo@bar.baz', 'products/xxx', 'orders/yyy']
   // testObjects: [],
 };
-
 
 const fetch = (url, opts = {}) => import('node-fetch')
   .then(({ default: fetch }) => fetch(`${baseUrl}${url}`, {
@@ -59,25 +61,25 @@ const createTestUser = () => fetchAsAdmin('/users', {
 })
   .then((resp) => {
     if (resp.status !== 200) {
-      throw new Error('Could not create test user');
+      throw new Error(`Error: Could not create test user - response ${resp.status}`);
     }
-    return fetch('/auth', { method: 'POST', body: __e2e.testUserCredentials });
+    return fetch('/login', { method: 'POST', body: __e2e.testUserCredentials });
   })
   .then((resp) => {
     if (resp.status !== 200) {
-      throw new Error('Could not authenticate test user');
+      throw new Error(`Error: Could not authenticate test user - response ${resp.status}`);
     }
     return resp.json();
   })
   .then(({ token }) => Object.assign(__e2e, { testUserToken: token }));
 
-const checkAdminCredentials = () => fetch('/auth', {
+const checkAdminCredentials = () => fetch('/login', {
   method: 'POST',
   body: __e2e.adminUserCredentials,
 })
   .then((resp) => {
     if (resp.status !== 200) {
-      throw new Error('Could not authenticate as admin user');
+      throw new Error(`Error: Could not authenticate as admin user - response ${resp.status}`);
     }
 
     return resp.json();
@@ -86,7 +88,7 @@ const checkAdminCredentials = () => fetch('/auth', {
 
 const waitForServerToBeReady = (retries = 10) => new Promise((resolve, reject) => {
   if (!retries) {
-    return reject(new Error('Server took to long to start'));
+    return reject(new Error('Server took too long to start'));
   }
 
   setTimeout(() => {
@@ -106,41 +108,47 @@ module.exports = () => new Promise((resolve, reject) => {
     return resolve();
   }
 
-  // TODO: Configurar DB de tests
+  mongoGlobalSetup({rootDir: __dirname}).then(async () => {
 
-  console.info('Staring local server...');
-  const child = spawn('npm', ['start', process.env.PORT || 8888], {
-    cwd: path.resolve(__dirname, '../'),
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
+    console.info('\n Starting local server...');
 
-  Object.assign(__e2e, { childProcessPid: child.pid });
+    const child = spawn(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['start', port],
+      {
+        cwd: path.resolve(__dirname, "../"),
+        stdio: ["ignore", "pipe", "pipe"],
+        env: { PATH: process.env.PATH, MONGO_URL: process.env.MONGO_URL }
+      }
+    );
 
-  child.stdout.on('data', (chunk) => {
-    console.info(`\x1b[34m${chunk.toString()}\x1b[0m`);
-  });
+    Object.assign(__e2e, { childProcessPid: child.pid });
 
-  child.stderr.on('data', (chunk) => {
-    const str = chunk.toString();
-    if (/DeprecationWarning/.test(str)) {
-      return;
-    }
-    console.error('child::stderr', str);
-  });
-
-  process.on('uncaughtException', (err) => {
-    console.error('UncaughtException!');
-    console.error(err);
-    kill(child.pid, 'SIGKILL', () => process.exit(1));
-  });
-
-  waitForServerToBeReady()
-    .then(checkAdminCredentials)
-    .then(createTestUser)
-    .then(resolve)
-    .catch((err) => {
-      kill(child.pid, 'SIGKILL', () => reject(err));
+    child.stdout.on('data', (chunk) => {
+      console.info(`\x1b[34m${chunk.toString()}\x1b[0m`);
     });
+
+    child.stderr.on('data', (chunk) => {
+      const str = chunk.toString();
+      if (/DeprecationWarning/.test(str)) {
+        return;
+      }
+      console.error('child::stderr', str);
+    });
+
+    process.on('uncaughtException', (err) => {
+      console.error('UncaughtException!');
+      console.error(err);
+      kill(child.pid, 'SIGKILL', () => process.exit(1));
+    });
+
+    waitForServerToBeReady()
+      .then(checkAdminCredentials)
+      .then(createTestUser)
+      .then(resolve)
+      .catch((err) => {
+        console.log('there was an error');
+        kill(child.pid, 'SIGKILL', () => reject(err));
+      })
+    }).catch((error)=> console.log(error));
 });
 
 // Export globals - ugly... :-(

@@ -4,7 +4,7 @@ const service = require('../services/index')
 function isAuth (req, res, next) {
 
     if(!req.headers.authorization){
-        return res.status(403).send({ message: 'No tienes autorización'})
+        return res.status(401).send({ message: 'No tienes autorización'})
     }
 
     const token = req.headers.authorization.split(' ')[1]
@@ -24,7 +24,7 @@ function isAdmin(req, res, next) {
     if (req.role === 'admin') {
       return next();
     } else {
-      return res.status(403).send({ message: 'No tienes autorización como administrador' });
+      return res.status(401).send({ message: 'No tienes autorización como administrador' });
     }
   }
   

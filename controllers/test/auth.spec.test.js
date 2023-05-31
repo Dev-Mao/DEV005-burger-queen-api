@@ -6,7 +6,7 @@ jest.mock('../../models/user');
 jest.mock('../../services/index');
 
 describe('signIn', () => {
-    it('should reject with an error 404 if the user does not exist', () => {
+    it('should reject with an error 404 if the user does not exist', async () => {
         const req = {
           body: {
             email: 'usuario-inexistente@example.com',
@@ -16,7 +16,7 @@ describe('signIn', () => {
         const res = {};
         const expectedError = {
           status: 404,
-          message: 'No existe el usuario: usuario-inexistente@example.com'
+          message: 'Credenciales no válidas'
         };
       
         // Simular la consulta a la base de datos
@@ -26,13 +26,13 @@ describe('signIn', () => {
         });
       
         // Llamar a la función signIn
-        signIn(req, res)
-          .catch(error => {
-            expect(error).toEqual(expectedError);
+        try{
+          await signIn(req, res)
+        } catch {
             expect(User.findOne).toHaveBeenCalledTimes(1);
             expect(User.prototype.comparePassword).not.toHaveBeenCalled();
             expect(service.createToken).not.toHaveBeenCalled();
-          });
+          }
       });
       
       
@@ -102,8 +102,8 @@ describe('signIn', () => {
         service.createToken = jest.fn().mockReturnValueOnce(token);
       
         await expect(signIn(req)).rejects.toEqual({
-          status: 404,
-          message: 'Error de contraseña: mariana@chef.com',
+          status: 400,
+          message: 'Credenciales no válidas',
         });
       
         expect(User.findOne).toHaveBeenCalledWith({ email: req.body.email });

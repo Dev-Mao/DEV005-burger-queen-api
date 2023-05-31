@@ -9,7 +9,7 @@ function getOrder(req, res) {
   let orderId = req.params.orderId;
 
   Order.findById(orderId)
-    .populate('products.product') // Utilizar "populate" para obtener los detalles del producto
+    .populate('products.product')
     .then((order) => {
       if (!order) {
         return res.status(404).send({ message: 'La orden no existe' });
@@ -52,14 +52,14 @@ function saveOrder(req, res) {
       User.findById(userId)
         .then((user) => {
           if (!user) {
-            return res.status(404).send({ message: 'El usuario no existe' });
+            return res.status(400).send({ message: 'El usuario no existe' });
           }
 
           // Verificar que los IDs de los productos existen
           const productIds = products.map((product) => product.productId);
           Product.find({ _id: { $in: productIds } })
             .then((foundProducts) => {
-              if (foundProducts.length !== productIds.length) {
+              if (foundProducts.length !== productIds.length || productIds.length === 0) {
                 return res.status(400).send({ message: 'Algunos productos no existen' });
               }
 
@@ -107,6 +107,9 @@ function updateOrder(req, res) {
 
   Order.findByIdAndUpdate(orderId, update)
     .then((orderUpdate) => {
+      if(!orderUpdate){
+        res.status(404).send({  message: 'La orden no existe' });
+      }
       if (update.status === 'delivered') {
         orderUpdate.deliveryDate = update.deliveryDate; // Actualizar la fecha de entrega en la respuesta
       }

@@ -5,9 +5,9 @@ const Schema = mongoose.Schema
 
 const orderSchema = new Schema({
     userId: { 
-        type: String, 
-        ref: 'User', 
-        required: true
+      type: String, 
+      ref: 'User', 
+      required: true
     },
     client: String,
     products: [{

@@ -20,10 +20,21 @@ const signUp = (req, res) => {
 }
 
 // Obtener un usuario
-function getUser (req, res){
-    let userId = req.params.userId
+function getUser(req, res) {
+  let userIdOrEmail = req.params.userIdOrEmail;
 
-    User.findById(userId)
+  // Verificar si el valor es un correo electrónico
+  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userIdOrEmail);
+
+  // Buscar usuario por ID o correo electrónico
+  let searchCondition;
+  if (isEmail) {
+    searchCondition = { email: userIdOrEmail };
+  } else {
+    searchCondition = { _id: userIdOrEmail };
+  }
+
+  User.findOne(searchCondition)
     .then((user) => {
       if (!user) {
         return res.status(404).send({ message: 'El usuario no existe' });
@@ -35,6 +46,12 @@ function getUser (req, res){
       return res.status(500).send({ message: `Error al realizar la petición: ${error}` });
     });
 }
+
+
+
+
+
+
 
 // Obtener todos los usuarios
 function getUsers (req, res){
