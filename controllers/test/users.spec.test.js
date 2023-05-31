@@ -2,59 +2,59 @@ const User = require('../../models/user');
 const { getUser, getUsers, signUp, updateUser, deleteUser } = require('../../controllers/user'); 
 
 describe('getUser', () => {
-    const req = { params: { userId: '123' } };
+    const req = { params: { userIdOrEmail: '123' } };
     const res = { status: jest.fn().mockReturnThis(), send: jest.fn() };
+  
     it('should return a user with the correct id', async () => {
-        const mockUser = {
-            _id: '123',
-            email: 'John@prueba.com'
-        };
-
-        // Mock de la función `User.findById`
-        User.findById = jest.fn().mockResolvedValue(mockUser);
-
-        await getUser(req, res);
-
-          // Verificar que la respuesta tenga un código de estado 200
-          expect(res.status).toHaveBeenCalledWith(200);
-          // Verificar que User.findById sea llamado con el id correcto
-          expect(User.findById).toHaveBeenCalledWith('123');
-          // Verificar que res.send sea llamado con el producto correcto
-          expect(res.send).toHaveBeenCalledWith({ user: mockUser });
+      const mockUser = {
+        _id: '123',
+        email: 'John@prueba.com'
+      };
+  
+      // Mock de la función `User.findOne`
+      User.findOne = jest.fn().mockResolvedValue(mockUser);
+  
+      await getUser(req, res);
+  
+      // Verificar que la respuesta tenga un código de estado 200
+      expect(res.status).toHaveBeenCalledWith(200);
+      // Verificar que User.findOne sea llamado con la condición de búsqueda correcta
+      expect(User.findOne).toHaveBeenCalledWith({ _id: '123' });
+      // Verificar que res.send sea llamado con el usuario correcto
+      expect(res.send).toHaveBeenCalledWith({ user: mockUser });
     });
-
+  
     it('should return error 404 if the user does not exist', async () => {
-
-        // Mock de la función `Product.findById`
-        User.findById = jest.fn().mockResolvedValue(null);
-
-        await getUser(req, res);
-
-          // Verificar que la respuesta tenga un código de estado 404
-          expect(res.status).toHaveBeenCalledWith(404);
-    })
-
-    it('should return error 500', async () => {
-        const error = new Error('Error de prueba');
-        // Agregar un mock para User.findById que devuelve un error
-        User.findById = jest.fn().mockRejectedValue(error);
-        
-        // Llamar a la función getUser con una solicitud y una respuesta simuladas
-        const req = { params: { userId: '123' } };
-        const res = { status: jest.fn().mockReturnThis(), send: jest.fn() };
-      
-        try {
-          await getUser(req, res);
-        } catch {
-          // Verificar que User.findById sea llamado con el id correcto
-          expect(User.findById).toHaveBeenCalledWith('123');
-          // Verificar que la respuesta tenga un código de estado 500
-          expect(res.status).toHaveBeenCalledWith(500);
-          // Verificar que la respuesta tenga un mensaje de error
-          expect(res.send).toHaveBeenCalledWith({ message: `Error al realizar la petición: ${error}` });
-        }
+      // Mock de la función `User.findOne` que devuelve null
+      User.findOne = jest.fn().mockResolvedValueOnce(null);
+  
+      await getUser(req, res);
+  
+      // Verificar que la respuesta tenga un código de estado 404
+      expect(res.status).toHaveBeenCalledWith(404);
     });
-});
+  
+    it('should return error 500', async () => {
+      const error = new Error('Error de prueba');
+      // Agregar un mock para User.findOne que devuelve un error
+      User.findOne = jest.fn().mockRejectedValue(error);
+      
+      try{
+        await getUser(req, res);
+      } catch{
+        // Verificar que User.findOne sea llamado con la condición de búsqueda correcta
+      expect(User.findOne).toHaveBeenCalledWith({ _id: '123' });
+      // Verificar que la respuesta tenga un código de estado 500
+      expect(res.status).toHaveBeenCalledWith(500);
+      // Verificar que la respuesta tenga un mensaje de error
+      expect(res.send).toHaveBeenCalledWith({ message: `Error al realizar la petición: ${error}` });
+      }
+      
+  
+      
+    });
+  });
+  
 
 describe('getUsers', () => {
     it('should return status 200 and the list of users', async () => {
@@ -70,11 +70,11 @@ describe('getUsers', () => {
         await getUsers(req, res);
     
         // Verificar que la respuesta tenga un código de estado 200
-        expect(res.status).toBeCalledWith(200);
+        expect(res.status).toHaveBeenCalledWith(200);
         // Verificar que user.find sea llamado
         expect(User.find).toHaveBeenCalled();
         // Verificar que la respuesta tenga la orden
-        expect(res.send).toBeCalledWith({ users: mockUser });
+        expect(res.send).toHaveBeenCalledWith({ users: mockUser });
     });
 
     it('should return error 404  if there is no users', async () => {

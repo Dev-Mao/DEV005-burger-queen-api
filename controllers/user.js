@@ -47,12 +47,6 @@ function getUser(req, res) {
     });
 }
 
-
-
-
-
-
-
 // Obtener todos los usuarios
 function getUsers (req, res){
   User.find({})
