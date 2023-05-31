@@ -18,9 +18,9 @@ services:
       NODE_ENV: production
       PORT: 8080
       DB_URL: mongodb+srv://agudelomariana2503:mao@cluster0.fkvmzan.mongodb.net/
-      JWT_SECRET: xxxxxxxx
-      ADMIN_EMAIL: admin@localhost
-      ADMIN_PASSWORD: changeme
+      JWT_SECRET: miclavedetokens
+      ADMIN_EMAIL: mariana@admin.com
+      ADMIN_PASSWORD: mariana
     volumes:
       - ./:/home/node/app # montamos el codigo en el HOME del usuario _node_
     expose:
