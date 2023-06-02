@@ -2,6 +2,7 @@
 const mongoose = require('mongoose')
 const app = require('./app')
 const config = require('./config')
+require('dotenv').config()
 
 const port = process.argv[2] || config.port || 8080;
 
@@ -11,7 +12,7 @@ app.set('pkg', pkg);
 
 async function connectToDatabase() {
   try {
-    await mongoose.connect(config.db, {
+    await mongoose.connect(process.env.MONGODB_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
