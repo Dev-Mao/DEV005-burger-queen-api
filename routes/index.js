@@ -12,9 +12,9 @@ const router = express.Router();
 // Productos
 router.get('/products', auth.isAuth, productCtrl.getProducts)
 router.get('/products/:productId', auth.isAuth, productCtrl.getProduct)
-router.post('/products', auth.isAuth, productCtrl.saveProduct)
-router.patch('/products/:productId', auth.isAuth, productCtrl.updateProduct)
-router.delete('/products/:productId', auth.isAuth, productCtrl.deleteProduct)
+router.post('/products', auth.isAuth, auth.isAdmin, productCtrl.saveProduct)
+router.patch('/products/:productId', auth.isAuth, auth.isAdmin, productCtrl.updateProduct)
+router.delete('/products/:productId', auth.isAuth,  auth.isAdmin, productCtrl.deleteProduct)
 
 // Órdenes
 router.get('/orders', auth.isAuth, orderCtrl.getOrders)

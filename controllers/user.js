@@ -65,7 +65,7 @@ function getUsers (req, res){
 
 // Actualizar un usuario
 function updateUser (req, res){
-    let userId = req.params.userIdId
+    let userId = req.params.userId
     let update = req.body
 
     User.findByIdAndUpdate(userId, update)

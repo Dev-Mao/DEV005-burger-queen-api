@@ -368,46 +368,46 @@ describe('PATCH /orders/:orderId', () => {
   ));
 });
   
-  // describe('DELETE /orders/:orderId', () => {
-  //   it('should fail with 401 when no auth', () => (
-  //     fetch('/orders/xxx', { method: 'DELETE' })
-  //       .then((resp) => expect(resp.status).toBe(401))
-  //   ));
+  describe('DELETE /orders/:orderId', () => {
+    it('should fail with 401 when no auth', () => (
+      fetch('/orders/xxx', { method: 'DELETE' })
+        .then((resp) => expect(resp.status).toBe(401))
+    ));
   
-  //   it('should fail with 404 when not found', () => (
-  //     fetchAsAdmin('/orders/xxx', { method: 'DELETE' })
-  //       .then((resp) => expect(resp.status).toBe(404))
-  //   ));
+    it('should fail with 404 when not found', () => (
+      fetchAsAdmin('/orders/xxx', { method: 'DELETE' })
+        .then((resp) => expect(resp.status).toBe(404))
+    ));
   
-  //   it('should delete other order as admin', () => (
-  //     Promise.all([
-  //       fetchAsAdmin('/products', {
-  //         method: 'POST',
-  //         body: { name: 'Test', price: 25 },
-  //       }),
-  //       fetchAsTestUser('/users/test@test.test'),
-  //     ])
-  //       .then((responses) => {
-  //         expect(responses[0].status).toBe(200);
-  //         expect(responses[1].status).toBe(200);
-  //         return Promise.all([responses[0].json(), responses[1].json()]);
-  //       })
-  //       .then(([product, user]) => fetchAsTestUser('/orders', {
-  //         method: 'POST',
-  //         body: { products: [{ productId: product._id, qty: 5 }], userId: user._id },
-  //       }))
-  //       .then((resp) => {
-  //         expect(resp.status).toBe(200);
-  //         return resp.json();
-  //       })
-  //       .then(
-  //         ({ _id }) => fetchAsAdmin(`/orders/${_id}`, { method: 'DELETE' })
-  //           .then((resp) => ({ resp, _id })),
-  //       )
-  //       .then(({ resp, _id }) => {
-  //         expect(resp.status).toBe(200);
-  //         return fetchAsAdmin(`/orders/${_id}`);
-  //       })
-  //       .then((resp) => expect(resp.status).toBe(404))
-  //   ));
-  // });
+    it('should delete other order as admin', () => (
+      Promise.all([
+        fetchAsAdmin('/products', {
+          method: 'POST',
+          body: { name: 'Test', price: 25 },
+        }),
+        fetchAsTestUser('/users/test@test.test'),
+      ])
+        .then((responses) => {
+          expect(responses[0].status).toBe(200);
+          expect(responses[1].status).toBe(200);
+          return Promise.all([responses[0].json(), responses[1].json()]);
+        })
+        .then(([product, user]) => fetchAsTestUser('/orders', {
+          method: 'POST',
+          body: { products: [{ productId: product._id, qty: 5 }], userId: user._id },
+        }))
+        .then((resp) => {
+          expect(resp.status).toBe(200);
+          return resp.json();
+        })
+        .then(
+          ({ _id }) => fetchAsAdmin(`/orders/${_id}`, { method: 'DELETE' })
+            .then((resp) => ({ resp, _id })),
+        )
+        .then(({ resp, _id }) => {
+          expect(resp.status).toBe(200);
+          return fetchAsAdmin(`/orders/${_id}`);
+        })
+        .then((resp) => expect(resp.status).toBe(404))
+    ));
+  });

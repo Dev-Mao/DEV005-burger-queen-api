@@ -19,8 +19,8 @@ const __e2e = {
   },
   adminToken: null,
   testUserCredentials: {
-    email: 'test@t4ss44s55ss.com',
-    password: '123456',
+    email: 'eshjempdlodo@test.com',
+    password: '123456'
   },
   testUserToken: null,
   childProcessPid: null,
